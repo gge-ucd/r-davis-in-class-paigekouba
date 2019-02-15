@@ -83,12 +83,13 @@ surveys_complete %>%
 # plotting time series
 yearly_counts <- surveys_complete %>% 
   count(year, species_id)
+str(yearly_counts)
 # same as doing group_by year, species_id and then tally()
 yearly_counts %>% 
   ggplot(aes(x=year, y=n)) + geom_line()
 # yuck. what we really want is a line for each species
 yearly_counts %>% 
-  ggplot(aes(x=year, y=n, group=species_id, color = species_id)) + geom_line()
+  ggplot(aes(x=year, y=n, group=species_id, color = species_id)) + geom_line() + geom_jitter()
 
 # facetting; a sub-plot for each thing in the grouping variable
 yearly_counts %>% 
