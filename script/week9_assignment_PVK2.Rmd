@@ -1,0 +1,61 @@
+---
+title: "week9_assignment_PVK2"
+author: "Paige Kouba"
+date: "3/10/2019"
+output: html_document
+---
+Part 1: Rmarkdown
+Create a new Rmarkdown document and save it as week9_assignment_ABC.Rmd with your initals in place of ABC.
+
+#####Tell your coding partner about your research! Write a small paragraph about what you think (or know) your central research question might be for your PhD or Masters. Bold your main question, italicize the name of your study species, and be sure to include a picture of your study species/study site/or another picture.
+
+The goal of my research is to better understand 
+**how climate influences temperate forests, and vice versa**. My current projects will use dendrochronology and stable isotope analysis, along with remote sensing and eddy covariance data, to examine the effects of drought and CO2 on 
+*Western mixed conifer species*.
+
+![](https://northlab.faculty.ucdavis.edu/wp-content/uploads/sites/195/2019/01/paige_treeheight.jpg)
+
+#####Use the storms data (included in RStudio) to create a plotly graph of the relationship between wind and pressure, where the status of the storm is indicated by a color.
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(viridis)
+library(plotly)
+glimpse(storms)
+ggplotly(
+  ggplot(data=storms)+
+    geom_jitter(aes(x=wind,y=pressure, fill=status), pch=21, alpha=0.5)+
+  theme_bw()+
+  labs(title="Storm Pressure v. Wind Speed", x = "Wind Speed (mph)", y="Pressure")
+)
+```
+
+#####Create a table that identifies the mean wind, pressure, ts_diameter, hu_diameter of each status of storm (remember to remove NAs!). Use the package htmlTable. Round each mean to only two decimal places (Hint: look up the function round)
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+stormsHW <- storms %>%
+  filter(!is.na(wind), !is.na(pressure), !is.na(ts_diameter), !is.na(hu_diameter)) %>% 
+  select(wind, pressure, ts_diameter, hu_diameter, status)
+glimpse(stormsHW)
+
+stormsHW_table <- stormsHW %>% 
+  group_by(status) %>% 
+  summarize(mean_wind = round(mean(wind), digits=2), mean_pressure = round(mean(pressure), digits=2), mean_ts_diameter = round(mean(ts_diameter), digits=2), mean_hu_diameter = round(mean(hu_diameter), digits=2)) 
+
+htmlTable::htmlTable(stormsHW_table)
+```
+
+
+#####**CHALLENGE** Find the duration, in number of days, of every hurricane from 2010 and later, and then use one of the map functions from purrr to write a sentence saying “Hurricane X lasted Y days” for each of these storms. You can look for some help with these functions here and here.
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+hurr_len <- storms %>% 
+  filter(status == "hurricane", year >= 2010) %>% 
+  group_by(name, year) %>% 
+  summarise(num_days = diff(range(day)))
+  
+map2_chr(.x = hurr_len$name, .y = hurr_len$num_days, function(x,y) paste("Hurricane", x, "lasted", y, "days"))
+```
+
+
+
+
+
